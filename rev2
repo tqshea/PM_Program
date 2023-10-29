@@ -1,0 +1,84 @@
+import tkinter as tk
+from tkinter import messagebox, filedialog, ttk
+import openpyxl
+from openpyxl.utils import get_column_letter
+from openpyxl.styles import Font
+from datetime import datetime
+
+# Function to handle saving the project details to the Excel file
+def save_project():
+    # Retrieve the project details from the input fields
+    project_name = project_name_entry.get()
+    project_number = project_number_entry.get()
+    contract_number = contract_number_entry.get()
+    mod_number = mod_number_entry.get()
+    pop_start = pop_start_entry.get()
+    pop_end = pop_end_entry.get()
+    kickoff_date = kickoff_date_entry.get()
+    industry_funds = industry_funds_entry.get()
+    cost_share = cost_share_entry.get()
+    gov_poc = gov_poc_entry.get()
+    industry_poc = industry_poc_entry.get()
+
+    # Create or load the selected Excel file
+    file_path = file_path_entry.get()
+    try:
+        wb = openpyxl.load_workbook(file_path)
+    except FileNotFoundError:
+        # If the file doesn't exist, create a new workbook
+        wb = openpyxl.Workbook()
+
+    # Check if the project sheet already exists, or create a new one
+    if project_number not in wb.sheetnames:
+        sheet = wb.create_sheet(project_number)
+        sheet.title = project_number
+        sheet["A1"] = "Project Name"
+        sheet["B1"] = "Project Number"
+        sheet["C1"] = "Contract Number"
+        sheet["D1"] = "MOD"
+        sheet["E1"] = "POP start"
+        sheet["F1"] = "POP end"
+        sheet["G1"] = "Kick-off Date"
+        sheet["H1"] = "Industry Funds"
+        sheet["I1"] = "Industry Spent"
+        sheet["J1"] = "Industry Remaining"
+        sheet["K1"] = "Cost Share"
+        sheet["L1"] = "Cost Share Spent"
+        sheet["M1"] = "Cost Share Remaining"
+        sheet["N1"] = "Government POC"
+        sheet["O1"] = "Industry POC"
+
+        # Add formatting to the header row
+        for cell in sheet["1"]:
+            cell.font = Font(bold=True)
+
+    else:
+        sheet = wb[project_number]
+
+    # Add project details to the sheet
+    row = sheet.max_row + 1
+    sheet.cell(row=row, column=1).value = project_name
+    sheet.cell(row=row, column=2).value = project_number
+    sheet.cell(row=row, column=3).value = contract_number
+    sheet.cell(row=row, column=4).value = mod_number
+    sheet.cell(row=row, column=5).value = pop_start
+    sheet.cell(row=row, column=6).value = pop_end
+    sheet.cell(row=row, column=7).value = kickoff_date
+    sheet.cell(row=row, column=8).value = industry_funds
+    sheet.cell(row=row, column=10).value = cost_share
+    sheet.cell(row=row, column=13).value = gov_poc
+    sheet.cell(row=row, column=14).value = industry_poc
+
+    # Save the changes to the Excel file
+    wb.save(file_path)
+
+    # Display success message
+    messagebox.showinfo("Success", "Project details saved!")
+
+# Function to handle adding monthly invoices to the project sheet
+def add_invoice():
+    # Retrieve the project number and invoice amount from the input fields
+    project_number = project_dropdown.get()
+    invoice_amount = invoice_amount_entry.get()
+
+    # Check if the project sheet
