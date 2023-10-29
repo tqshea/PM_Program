@@ -1,0 +1,87 @@
+import tkinter as tk
+from tkinter import messagebox, filedialog
+import openpyxl
+
+# Function to handle saving the project details to the Excel file
+def save_project():
+    # Retrieve the project details from the input fields
+    project_name = project_name_entry.get()
+    start_date = start_date_entry.get()
+    end_date = end_date_entry.get()
+    status = status_entry.get()
+
+    # Create or load the selected Excel file
+    file_path = file_path_entry.get()
+    try:
+        wb = openpyxl.load_workbook(file_path)
+    except FileNotFoundError:
+        # If the file doesn't exist, create a new workbook
+        wb = openpyxl.Workbook()
+
+    # Check if the project sheet already exists, or create a new one
+    if project_name not in wb.sheetnames:
+        sheet = wb.create_sheet(project_name)
+        # Add headers to the new sheet
+        sheet.append(["Project Name", "Start Date", "End Date", "Status"])
+
+    else:
+        sheet = wb[project_name]
+
+    # Check if the project details already exist in the sheet
+    # If not, add a new row
+    if not any(cell.value == project_name for cell in sheet['A']):
+        sheet.append([project_name, start_date, end_date, status])
+
+    # Save the changes to the Excel file
+    wb.save(file_path)
+
+    # Display success message
+    messagebox.showinfo("Success", "Project details saved!")
+
+# Function to browse and select the Excel file
+def browse_file():
+    file_path = filedialog.askopenfilename(filetypes=[("Excel Files", "*.xlsx")])
+    file_path_entry.delete(0, tk.END)
+    file_path_entry.insert(0, file_path)
+
+# Create the GUI window
+window = tk.Tk()
+window.title("Project Tracker")
+
+# Add input fields for project details
+project_name_label = tk.Label(window, text="Project Name:")
+project_name_label.pack()
+project_name_entry = tk.Entry(window)
+project_name_entry.pack()
+
+start_date_label = tk.Label(window, text="Start Date:")
+start_date_label.pack()
+start_date_entry = tk.Entry(window)
+start_date_entry.pack()
+
+end_date_label = tk.Label(window, text="End Date:")
+end_date_label.pack()
+end_date_entry = tk.Entry(window)
+end_date_entry.pack()
+
+status_label = tk.Label(window, text="Status:")
+status_label.pack()
+status_entry = tk.Entry(window)
+status_entry.pack()
+
+# Add an input field for the Excel file path
+file_path_label = tk.Label(window, text="Excel File:")
+file_path_label.pack()
+file_path_entry = tk.Entry(window)
+file_path_entry.pack()
+
+# Add a button to browse and select the Excel file
+browse_button = tk.Button(window, text="Browse", command=browse_file)
+browse_button.pack()
+
+# Add a button to save the project details
+save_button = tk.Button(window, text="Save", command=save_project)
+save_button.pack()
+
+# Run the GUI window
+window.mainloop()
